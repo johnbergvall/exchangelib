@@ -167,6 +167,7 @@ class EWSService(metaclass=abc.ABCMeta):
             version_hint = self.protocol.config.version
             if isinstance(self.protocol.credentials, OAuth2Credentials):
                 account_to_impersonate = self.protocol.credentials.identity
+                primary_smtp_address = self.account.primary_smtp_address
         api_versions = [version_hint.api_version] + [v for v in API_VERSIONS if v != version_hint.api_version]
         for api_version in api_versions:
             log.debug('Trying API version %s', api_version)
