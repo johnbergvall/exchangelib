@@ -698,6 +698,7 @@ def post_ratelimited(protocol, session, url, headers, data, allow_redirects=Fals
     wait = RETRY_WAIT  # Initial retry wait. We double the value on each retry
     retry = 0
     redirects = 0
+    session_just_refreshed = False  # Keep track of refreshed tokens to prevent loop
     log_msg = '''\
 Retry: %(retry)s
 Waited: %(wait)s
@@ -778,8 +779,12 @@ Response data: %(xml_response)s
             log.debug(log_msg, log_vals)
             if _need_new_credentials(response=r):
                 r.close()  # Release memory
+                if session_just_refreshed:  # Raise exception instead of loop
+                    break
                 session = protocol.refresh_credentials(session)
+                session_just_refreshed = True
                 continue
+            session_just_refreshed = False
             total_wait = time.monotonic() - t_start
             if _may_retry_on_error(response=r, retry_policy=protocol.retry_policy, wait=total_wait):
                 r.close()  # Release memory
