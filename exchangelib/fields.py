@@ -729,6 +729,9 @@ class DateOrDateTimeField(DateTimeField):
         if val is not None and len(val) == 16:
             # This is a date format with timezone info, as sent by task recurrences. Eg: '2006-01-09+01:00'
             return self._date_field.from_xml(elem=elem, account=account)
+        elif val is not None and len(val) == 11:
+            # This is a date format with UTC, as sent by task recurrences. Eg: '2006-01-09Z'
+            return self._date_field.from_xml(elem=elem, account=account)
         return super().from_xml(elem=elem, account=account)
 
 
